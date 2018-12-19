@@ -13,14 +13,47 @@ public enum B2BucketType : String {
     case AllPrivate = "allPrivate"
 }
 
-public func b2AuthorizeAccount(config: B2StorageConfig) -> String {
-    var jsonStr = ""
+public typealias B2CompletionHandler = (String?,Error?) -> Void
+
+public typealias B2DataCompletionHandler = (Data?,Error?) -> Void
+
+public typealias B2JSONObject = [String: Any]
+
+public typealias B2JSONArray = [B2JSONObject]
+
+public extension String {
+ 
+    func toB2JSONObject() -> B2JSONObject? {
+     
+        if let stringData = self.data(using: .utf8) {
+            let jsonObject = try? JSONSerialization.jsonObject(with: stringData, options: .mutableContainers) as! B2JSONObject
+            
+            return jsonObject
+        } else {
+            return nil
+        }
+        
+    }
+    
+    func toB2JSONObject() -> B2JSONArray? {
+        
+        if let stringData = self.data(using: .utf8) {
+            let jsonObject = try? JSONSerialization.jsonObject(with: stringData, options: .mutableContainers) as! B2JSONArray
+            
+            return jsonObject
+        } else {
+            return nil
+        }
+        
+    }
+    
+}
+
+public func b2AuthorizeAccount(config: B2StorageConfig, completionHandler: @escaping B2CompletionHandler) {
     
     if let url = URL(string: "https://\(config.authServerStr)/b2api/v1/b2_authorize_account") {
         
-        _ = URLSession.shared
-        
-        let request = NSMutableURLRequest(url: url)
+        var request = URLRequest(url: url)
         
         let authStr = "\(config.accountId!):\(config.applicationKey!)"
         
@@ -32,17 +65,68 @@ public func b2AuthorizeAccount(config: B2StorageConfig) -> String {
         
         let authSessionConfig = URLSessionConfiguration.default
         authSessionConfig.httpAdditionalHeaders = ["Authorization":"Basic \(base64Str)"]
+
+        executeRequest(request: request, withSessionConfig: authSessionConfig, completionHandler: completionHandler)
         
-        if let requestData = executeRequest(request: request, withSessionConfig: authSessionConfig) {
-            jsonStr = NSString(data: requestData as Data, encoding: String.Encoding.utf8.rawValue)! as String
+    } else {
+        completionHandler(nil,nil)
+    }
+    
+}
+
+public func executeRequest(request: URLRequest, withSessionConfig sessionConfig: URLSessionConfiguration?, completionHandler: @escaping B2CompletionHandler) {
+    
+    let session: URLSession
+    
+    if (sessionConfig != nil) {
+        session = URLSession(configuration: sessionConfig!)
+    } else {
+        session = URLSession.shared
+    }
+    
+    let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
+        
+        if error != nil {
+            completionHandler(nil,error)
+        } else if data != nil {
+            let jsonStr = String(data: data!, encoding: .utf8)
+            completionHandler(jsonStr,nil)
+        } else {
+            completionHandler(nil,nil)
         }
         
     }
     
-    return jsonStr
+    task.resume()
 }
 
-public func executeRequest(request: NSMutableURLRequest, withSessionConfig sessionConfig: URLSessionConfiguration?, andDelegate sessionDelegate: URLSessionDelegate) {
+public func executeRequest(request: URLRequest, withSessionConfig sessionConfig: URLSessionConfiguration?, completionHandler: @escaping B2DataCompletionHandler) {
+    
+    let session: URLSession
+    
+    if (sessionConfig != nil) {
+        session = URLSession(configuration: sessionConfig!)
+    } else {
+        session = URLSession.shared
+    }
+    
+    let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
+        
+        if error != nil {
+            completionHandler(nil,error)
+        } else if data != nil {
+            completionHandler(data,nil)
+        } else {
+            completionHandler(nil,nil)
+        }
+        
+    }
+    
+    task.resume()
+}
+
+
+public func executeRequest(request: URLRequest, withSessionConfig sessionConfig: URLSessionConfiguration?, andDelegate sessionDelegate: URLSessionDelegate) {
     let session: URLSession
     
     if (sessionConfig != nil) {
@@ -56,7 +140,8 @@ public func executeRequest(request: NSMutableURLRequest, withSessionConfig sessi
     task.resume()
 }
 
-public func executeRequest(request: NSMutableURLRequest, withSessionConfig sessionConfig: URLSessionConfiguration?) -> NSData? {
+
+public func executeUploadRequest(request: URLRequest, uploadData: Data, withSessionConfig sessionConfig: URLSessionConfiguration?, completionHandler: @escaping B2CompletionHandler) {
     let session: URLSession
     
     if (sessionConfig != nil) {
@@ -65,62 +150,34 @@ public func executeRequest(request: NSMutableURLRequest, withSessionConfig sessi
         session = URLSession.shared
     }
     
-    var requestData: NSData?
-    
-    let task = session.dataTask(with: request as URLRequest) { (data, response, error) in
+    let task = session.uploadTask(with: request as URLRequest, from: uploadData) { (data, response, error) in
         
         if error != nil {
-            print("error: \(error!.localizedDescription)")
-        }
-            
-        else if data != nil {
-            requestData = NSData(data: data!)
+            completionHandler(nil,error)
+        } else if data != nil {
+            let jsonStr = String(data: data!, encoding: .utf8)
+            completionHandler(jsonStr,nil)
+        } else {
+            completionHandler(nil,nil)
         }
         
     }
     
     task.resume()
-    
-    // We need to sleep so that the task can finish.  It is a little
-    // contrived I suppose.
-    
-    while (task.state != .completed && task.state != .canceling) {
-        sleep(1)
-    }
-    
-    return requestData
 }
 
-public func executeUploadRequest(request: NSMutableURLRequest, uploadData: NSData, withSessionConfig sessionConfig: URLSessionConfiguration?) -> NSData? {
+
+public func executeUploadRequest(request: URLRequest, file: URL, withSessionConfig sessionConfig: URLSessionConfiguration?, sessionDelegate: URLSessionDelegate) {
     let session: URLSession
     
     if (sessionConfig != nil) {
-        session = URLSession(configuration: sessionConfig!)
+        session = URLSession(configuration: sessionConfig!, delegate: sessionDelegate, delegateQueue: nil)
     } else {
-        session = URLSession.shared
+        session = URLSession(configuration: URLSessionConfiguration.ephemeral, delegate: sessionDelegate, delegateQueue: nil)
     }
     
-    var requestData: NSData?
-    
-    let task = session.uploadTask(with: request as URLRequest, from: uploadData as Data) { (data, response, error) in
-        
-        if error != nil {
-            print("error: \(error!.localizedDescription)")
-        }
-            
-        else if data != nil {
-            requestData = NSData(data: data!)
-        }
-        
-    }
+    let task = session.uploadTask(with: request, fromFile: file)
     
     task.resume()
-    // We need to sleep so that the task can finish.  It is a little
-    // contrived I suppose.
-    
-    while (task.state != .completed && task.state != .canceling) {
-        sleep(1)
-    }
-    
-    return requestData
 }
+

@@ -11,8 +11,12 @@ import XCTest
 
 class HMDABackblazeB2Tests: XCTestCase {
 
-    var accountID: String? {
-        return ProcessInfo.processInfo.environment["B2ACCOUNTID"]
+    var fileID: String? {
+        return ProcessInfo.processInfo.environment["B2FILEID"]
+    }
+    
+    var bucketID: String? {
+        return ProcessInfo.processInfo.environment["B2BUCKETID"]
     }
     
     var keyID: String? {
@@ -36,59 +40,96 @@ class HMDABackblazeB2Tests: XCTestCase {
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         
+        let expect = XCTestExpectation(description: "Authorization")
+        
+        b2AuthorizeAccount(config: b2Config) { (jsonStr, error) in
+            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
+            
+            if error == nil, jsonStr != nil {
+                self.b2Config.processAuthorization(jsonStr: jsonStr!)
+                expect.fulfill()
+            } else {
+                XCTFail()
+                expect.fulfill()
+            }
+            
+        }
+        
+        wait(for: [expect], timeout: 20.0)
     }
 
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testAuthorization() {
-        
-        let expect = XCTestExpectation(description: "Authorization")
-        
-        let jsonAuthorize = b2AuthorizeAccount(config: b2Config)
-        
-        NSLog("JSON Response:\n\n\(jsonAuthorize)")
-        
-        b2Config.processAuthorization(jsonStr: jsonAuthorize)
-        
-        if b2Config.accountAuthorizationToken != nil {
-            expect.fulfill()
-            
-            NSLog("Obtained authorization: \(b2Config.accountAuthorizationToken!)")
-        } else {
-            XCTFail()
-        }
-        
-    }
-    
     func testListBuckets() {
         
         let expect = XCTestExpectation(description: "List Buckets")
         
-        let jsonAuthorize = b2AuthorizeAccount(config: b2Config)
-        b2Config.processAuthorization(jsonStr: jsonAuthorize)
-        
-        let json = b2ListBuckets(config: b2Config)
-        
-        NSLog("JSON Response:\n\n\(json)")
-        
-        if let jsonObject = try? JSONSerialization.jsonObject(with: json.data(using: .utf8)!, options: .mutableContainers) as! [String: Any] {
+        b2ListBuckets(config: b2Config) { (jsonStr, error) in
+            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
             
-            if let buckets = jsonObject["buckets"] as? [[String: Any]] {
+            if error == nil, jsonStr != nil {
                 expect.fulfill()
-                
-                NSLog("BUCKETS:\n\n\(buckets)")
             } else {
                 XCTFail()
+                expect.fulfill()
             }
             
-        } else {
-            XCTFail()
         }
         
-        NSLog("JSON Response:\n\n\(json)")
+        wait(for: [expect], timeout: 20.0)
+    }
+    
+    
+    func testListFiles() {
         
+        guard bucketID != nil else {
+            XCTFail()
+            return
+        }
+        
+        let expect = XCTestExpectation(description: "List Files")
+        
+        b2ListFileNames(config: b2Config,
+                        bucketId: bucketID!,
+                        startFileName: nil,
+                        maxFileCount: 1000) { (jsonStr, error) in
+                            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
+                            
+                            if error == nil, jsonStr != nil {
+                                expect.fulfill()
+                            } else {
+                                XCTFail()
+                                expect.fulfill()
+                            }
+        }
+        
+        wait(for: [expect], timeout: 20.0)
+    }
+    
+    
+    func testGetFileInfo() {
+        
+        guard fileID != nil else {
+            XCTFail()
+            return
+        }
+        
+        let expect = XCTestExpectation(description: "List Files")
+        
+        b2GetFileInfo(config: b2Config, fileId: fileID!) { (jsonStr, error) in
+            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
+            
+            if error == nil, jsonStr != nil {
+                expect.fulfill()
+            } else {
+                XCTFail()
+                expect.fulfill()
+            }
+        }
+        
+        wait(for: [expect], timeout: 20.0)
     }
     
 /*

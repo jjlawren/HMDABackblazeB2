@@ -14,14 +14,14 @@
 		850A0A8F21C797EA00F2DA44 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A8D21C797EA00F2DA44 /* Configuration.swift */; };
 		850A0A9121C79BE500F2DA44 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9021C79BE500F2DA44 /* Utils.swift */; };
 		850A0A9221C79BE500F2DA44 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9021C79BE500F2DA44 /* Utils.swift */; };
-		850A0A9421C79C1200F2DA44 /* Buckets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9321C79C1200F2DA44 /* Buckets.swift */; };
-		850A0A9521C79C1200F2DA44 /* Buckets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9321C79C1200F2DA44 /* Buckets.swift */; };
-		850A0A9721C79C1900F2DA44 /* Upload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9621C79C1900F2DA44 /* Upload.swift */; };
-		850A0A9821C79C1900F2DA44 /* Upload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9621C79C1900F2DA44 /* Upload.swift */; };
-		850A0A9A21C79C1F00F2DA44 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9921C79C1F00F2DA44 /* Download.swift */; };
-		850A0A9B21C79C1F00F2DA44 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9921C79C1F00F2DA44 /* Download.swift */; };
-		850A0A9D21C79C2900F2DA44 /* Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9C21C79C2900F2DA44 /* Files.swift */; };
-		850A0A9E21C79C2900F2DA44 /* Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9C21C79C2900F2DA44 /* Files.swift */; };
+		8535EFFD21CA2FE000147AC4 /* Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9C21C79C2900F2DA44 /* Files.swift */; };
+		8535EFFE21CA2FE000147AC4 /* Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9C21C79C2900F2DA44 /* Files.swift */; };
+		8535EFFF21CA33B300147AC4 /* Buckets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9321C79C1200F2DA44 /* Buckets.swift */; };
+		8535F00021CA33B400147AC4 /* Buckets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9321C79C1200F2DA44 /* Buckets.swift */; };
+		85D7814521CA374C00731231 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9921C79C1F00F2DA44 /* Download.swift */; };
+		85D7814621CA374D00731231 /* Download.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9921C79C1F00F2DA44 /* Download.swift */; };
+		85D7814721CA386000731231 /* Upload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9621C79C1900F2DA44 /* Upload.swift */; };
+		85D7814821CA386000731231 /* Upload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 850A0A9621C79C1900F2DA44 /* Upload.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -223,12 +223,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				850A0A9721C79C1900F2DA44 /* Upload.swift in Sources */,
+				85D7814721CA386000731231 /* Upload.swift in Sources */,
 				850A0A8E21C797EA00F2DA44 /* Configuration.swift in Sources */,
+				8535EFFF21CA33B300147AC4 /* Buckets.swift in Sources */,
+				8535EFFD21CA2FE000147AC4 /* Files.swift in Sources */,
 				850A0A9121C79BE500F2DA44 /* Utils.swift in Sources */,
-				850A0A9421C79C1200F2DA44 /* Buckets.swift in Sources */,
-				850A0A9A21C79C1F00F2DA44 /* Download.swift in Sources */,
-				850A0A9D21C79C2900F2DA44 /* Files.swift in Sources */,
+				85D7814521CA374C00731231 /* Download.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,11 +236,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85D7814821CA386000731231 /* Upload.swift in Sources */,
 				850A0A8F21C797EA00F2DA44 /* Configuration.swift in Sources */,
-				850A0A9821C79C1900F2DA44 /* Upload.swift in Sources */,
-				850A0A9E21C79C2900F2DA44 /* Files.swift in Sources */,
-				850A0A9521C79C1200F2DA44 /* Buckets.swift in Sources */,
-				850A0A9B21C79C1F00F2DA44 /* Download.swift in Sources */,
+				8535F00021CA33B400147AC4 /* Buckets.swift in Sources */,
+				8535EFFE21CA2FE000147AC4 /* Files.swift in Sources */,
+				85D7814621CA374D00731231 /* Download.swift in Sources */,
 				850A0A7D21C792F000F2DA44 /* HMDABackblazeB2Tests.swift in Sources */,
 				850A0A9221C79BE500F2DA44 /* Utils.swift in Sources */,
 			);
@@ -392,6 +392,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = HMDABackblazeB2/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -419,6 +420,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = HMDABackblazeB2/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

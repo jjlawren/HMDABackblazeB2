@@ -16,9 +16,9 @@ public struct B2StorageConfig {
     public var emailAddress: String?
     public var accountId: String?
     public var applicationKey: String?
-    public var apiUrl: NSURL?
-    public var downloadUrl: NSURL?
-    public var uploadUrl: NSURL?
+    public var apiUrl: URL?
+    public var downloadUrl: URL?
+    public var uploadUrl: URL?
     public var accountAuthorizationToken: String?
     public var uploadAuthorizationToken: String?
     
@@ -29,11 +29,11 @@ public struct B2StorageConfig {
             if let dict = (try? JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)) as? NSDictionary {
                 
                 if let downloadStr = dict["downloadUrl"] as? String {
-                    self.downloadUrl = NSURL(string: downloadStr)
+                    self.downloadUrl = URL(string: downloadStr)
                 }
                 
                 if let apiStr = dict["apiUrl"] as? String {
-                    self.apiUrl = NSURL(string: apiStr)
+                    self.apiUrl = URL(string: apiStr)
                 }
                 
                 if let authTokenStr = dict["authorizationToken"] as? String {
@@ -71,7 +71,7 @@ public struct B2StorageConfig {
             if let dict = (try? JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers)) as? NSDictionary {
                 
                 if let uploadUrlStr = dict["uploadUrl"] as? String {
-                    self.uploadUrl = NSURL(string: uploadUrlStr)
+                    self.uploadUrl = URL(string: uploadUrlStr)
                 }
                 
                 if let uploadAuthTokenStr = dict["authorizationToken"] as? String {

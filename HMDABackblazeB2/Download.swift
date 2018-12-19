@@ -8,79 +8,35 @@
 
 import Foundation
 
-public func b2DownloadFileById(fileId: String, config: B2StorageConfig, andDelegate sessionDelegate: URLSessionDelegate) {
+
+public func b2DownloadFile(byID fileId: String, config: B2StorageConfig, andDelegate sessionDelegate: URLSessionDelegate) {
 
     if let url = config.downloadUrl {
-        let request = NSMutableURLRequest(url: url.appendingPathComponent("/b2api/v1/b2_download_file_by_id")!)
-        
+        var request = URLRequest(url: url.appendingPathComponent("/b2api/v1/b2_download_file_by_id"))
+ 
         request.httpMethod = "POST"
         request.addValue(config.accountAuthorizationToken!, forHTTPHeaderField: "Authorization")
-        
         request.httpBody = try? JSONSerialization.data(withJSONObject: ["fileId":"\(fileId)"], options: .prettyPrinted)
-        
+ 
         executeRequest(request: request, withSessionConfig: nil, andDelegate: sessionDelegate)
     }
-    
+ 
 }
 
-public func b2DownloadFileById(fileId: String, config: B2StorageConfig) -> NSData? {
-    var downloadedData: NSData? = nil
-    
+
+public func b2DownloadFile(byID fileId: String, config: B2StorageConfig, completionHandler: @escaping B2DataCompletionHandler) {
+ 
     if let url = config.downloadUrl {
-        
-        let request = NSMutableURLRequest(url: url.appendingPathComponent("/b2api/v1/b2_download_file_by_id")!)
-        
+        var request = URLRequest(url: url.appendingPathComponent("/b2api/v1/b2_download_file_by_id"))
+ 
         request.httpMethod = "POST"
         request.addValue(config.accountAuthorizationToken!, forHTTPHeaderField: "Authorization")
-        
         request.httpBody = try? JSONSerialization.data(withJSONObject: ["fileId":"\(fileId)"], options: .prettyPrinted)
-        
-        if let requestData = executeRequest(request: request, withSessionConfig: nil) {
-            downloadedData = requestData
-        }
-        
+ 
+        executeRequest(request: request, withSessionConfig: nil, completionHandler: completionHandler)
+    } else {
+        completionHandler(nil,nil)
     }
-    
-    return downloadedData
+ 
 }
 
-public func b2DownloadFileByIdEx(fileId: String, config: B2StorageConfig, andDelegate sessionDelegate: URLSessionDelegate) {
-    
-    if let url = config.downloadUrl {
-        
-        if let urlComponents = NSURLComponents(string: "\(url.absoluteString!)/b2api/v1/b2_download_file_by_id") {
-            urlComponents.query = "fileId=\(fileId)"
-            
-            let request = NSMutableURLRequest(url: urlComponents.url!)
-            request.httpMethod = "GET"
-            request.addValue(config.accountAuthorizationToken!, forHTTPHeaderField: "Authorization")
-            
-            executeRequest(request: request, withSessionConfig: nil, andDelegate: sessionDelegate)
-        }
-        
-    }
-    
-}
-
-public func b2DownloadFileByIdEx(fileId: String, config: B2StorageConfig) -> NSData? {
-    var downloadedData: NSData? = nil
-    
-    if let url = config.downloadUrl {
-
-        if let urlComponents = NSURLComponents(string: "\(url.absoluteString!)/b2api/v1/b2_download_file_by_id") {
-            urlComponents.query = "fileId=\(fileId)"
-        
-            let request = NSMutableURLRequest(url: urlComponents.url!)
-            request.httpMethod = "GET"
-            request.addValue(config.accountAuthorizationToken!, forHTTPHeaderField: "Authorization")
-            
-            if let requestData = executeRequest(request: request, withSessionConfig: nil) {
-                downloadedData = requestData
-            }
-            
-        }
-        
-    }
-    
-    return downloadedData
-}

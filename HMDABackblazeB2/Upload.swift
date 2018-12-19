@@ -8,82 +8,64 @@
 
 import Foundation
 
-/*
-public func b2ListFileNames(bucketId: String, startFileName: String?, maxFileCount: Int, config: B2StorageConfig) -> String {
-    var jsonStr = ""
- 
-    if let url = config.apiUrl {
- 
-        let request = NSMutableURLRequest(url: url.appendingPathComponent("/b2api/v1/b2_list_file_names")!)
-        request.httpMethod = "POST"
-        request.addValue(config.accountAuthorizationToken!, forHTTPHeaderField: "Authorization")
- 
-        var params = "{\"bucketId\":\"\(bucketId)\""
- 
-        if let startFileStr = startFileName {
-            params += ",\"startFileName\":\"\(startFileStr)\""
-        }
- 
-        if (maxFileCount > -1) {
-            params += ",\"maxFileCount\":" + String(maxFileCount)
-        }
- 
-        params += "}"
- 
-        request.httpBody = params.data(using: .utf8, allowLossyConversion: false)
- 
-        if let requestData = executeRequest(request: request, withSessionConfig: nil) {
-            jsonStr = NSString(data: requestData as Data, encoding: String.Encoding.utf8.rawValue)! as String
-        }
- 
-    }
- 
-    return jsonStr
-}
-*/
+public func b2GetUploadUrl(config: B2StorageConfig, bucketId: String, completionHandler: @escaping B2CompletionHandler) {
 
-public func b2GetUploadUrl(bucketId: String, config: B2StorageConfig) -> String {
-    var jsonStr = ""
-    
     if let url = config.apiUrl {
+        var request = URLRequest(url: url.appendingPathComponent("/b2api/v1/b2_get_upload_url"))
         
-        let request = NSMutableURLRequest(url: url.appendingPathComponent("/b2api/v1/b2_get_upload_url")!)
         request.httpMethod = "POST"
         request.addValue(config.accountAuthorizationToken!, forHTTPHeaderField: "Authorization")
-        
         request.httpBody = try? JSONSerialization.data(withJSONObject: ["bucketId":"\(bucketId)"], options: .prettyPrinted)
         
-        if let requestData = executeRequest(request: request, withSessionConfig: nil) {
-            jsonStr = NSString(data: requestData as Data, encoding: String.Encoding.utf8.rawValue)! as String
-        }
-        
+        executeRequest(request: request, withSessionConfig: nil, completionHandler: completionHandler)
+    } else {
+        completionHandler(nil,nil)
     }
     
-    return jsonStr
 }
 
-public func b2UploadFile(fileUrl: NSURL, fileName: String, contentType: String, sha1: String, config: B2StorageConfig) -> String {
-    var jsonStr = ""
+public func b2UploadFile(config: B2StorageConfig, fileUrl: URL, fileName: String, contentType: String, sha1: String, sessionDelegate: URLSessionDelegate) {
     
     if let url = config.uploadUrl {
         
-        if let fileData = NSData(contentsOf: fileUrl.absoluteURL!) {
+        var request = URLRequest(url: url.absoluteURL)
         
-            let request = NSMutableURLRequest(url: url.absoluteURL!)
-            request.httpMethod = "POST"
+        request.httpMethod = "POST"
+        request.addValue(config.uploadAuthorizationToken!, forHTTPHeaderField: "Authorization")
+        request.addValue(fileName, forHTTPHeaderField: "X-Bz-File-Name")
+        request.addValue(contentType, forHTTPHeaderField: "Content-Type")
+        request.addValue(sha1, forHTTPHeaderField: "X-Bz-Content-Sha1")
+        
+        executeUploadRequest(request: request, file: fileUrl, withSessionConfig: nil, sessionDelegate: sessionDelegate)
+        
+    }
+    
+}
+
+
+public func b2UploadFile(config: B2StorageConfig, fileUrl: URL, fileName: String, contentType: String, sha1: String, completionHandler: @escaping B2CompletionHandler) {
+ 
+    if let url = config.uploadUrl {
+
+        if let fileData = try? Data(contentsOf: fileUrl.absoluteURL) {
+ 
+            var request = URLRequest(url: url.absoluteURL)
             
+            request.httpMethod = "POST"
             request.addValue(config.uploadAuthorizationToken!, forHTTPHeaderField: "Authorization")
             request.addValue(fileName, forHTTPHeaderField: "X-Bz-File-Name")
             request.addValue(contentType, forHTTPHeaderField: "Content-Type")
             request.addValue(sha1, forHTTPHeaderField: "X-Bz-Content-Sha1")
-            
-            if let requestData = executeUploadRequest(request: request, uploadData: fileData, withSessionConfig: nil) {
-                jsonStr = NSString(data: requestData as Data, encoding: String.Encoding.utf8.rawValue)! as String
-            }
-            
+ 
+            executeUploadRequest(request: request,
+                                 uploadData: fileData,
+                                 withSessionConfig: nil,
+                                 completionHandler: completionHandler)
+ 
         }
-        
+ 
+    } else {
+        completionHandler(nil,nil)
     }
-    
-    return jsonStr
+ 
 }
