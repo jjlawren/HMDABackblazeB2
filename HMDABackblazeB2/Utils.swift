@@ -8,6 +8,35 @@
 
 import Foundation
 
+public struct B2File {
+    
+    public var action: String
+    public var accountId: String
+    public var bucketId: String
+    public var contentLength: Int
+    public var contentType: String
+    public var fileId: String
+    public var contentSha1: String
+    public var fileName: String
+    public var size: Int
+    public var uploadTimestamp: Double
+    
+    public static func b2File(from jsonObject: B2JSONObject) -> B2File {
+        
+        return B2File(action: jsonObject["action"] as! String,
+                      accountId: jsonObject["accountId"] as! String,
+                      bucketId: jsonObject["bucketId"] as! String,
+                      contentLength: jsonObject["contentLength"] as! Int,
+                      contentType: jsonObject["contentType"] as! String,
+                      fileId: jsonObject["fileId"] as! String,
+                      contentSha1: jsonObject["contentSha1"] as! String,
+                      fileName: jsonObject["fileName"] as! String,
+                      size: jsonObject["size"] as! Int,
+                      uploadTimestamp: jsonObject["uploadTimestamp"] as! Double)
+    }
+    
+}
+
 public enum B2BucketType : String {
     case AllPublic = "allPublic"
     case AllPrivate = "allPrivate"
@@ -35,7 +64,7 @@ public extension String {
         
     }
     
-    func toB2JSONObject() -> B2JSONArray? {
+    func toB2JSONArray() -> B2JSONArray? {
         
         if let stringData = self.data(using: .utf8) {
             let jsonObject = try? JSONSerialization.jsonObject(with: stringData, options: .mutableContainers) as! B2JSONArray
@@ -45,6 +74,22 @@ public extension String {
             return nil
         }
         
+    }
+ 
+    var isValidB2AuthorizationResponse: Bool {
+     
+        if let authObject = self.toB2JSONObject() {
+            
+            if authObject["authorizationToken"] != nil {
+                return true
+            } else {
+                return false
+            }
+            
+        } else {
+            return false
+        }
+     
     }
     
 }

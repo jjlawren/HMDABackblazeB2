@@ -43,9 +43,9 @@ class HMDABackblazeB2Tests: XCTestCase {
         let expect = XCTestExpectation(description: "Authorization")
         
         b2AuthorizeAccount(config: b2Config) { (jsonStr, error) in
-            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
             
             if error == nil, jsonStr != nil {
+                NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
                 self.b2Config.processAuthorization(jsonStr: jsonStr!)
                 expect.fulfill()
             } else {
@@ -67,7 +67,7 @@ class HMDABackblazeB2Tests: XCTestCase {
         let expect = XCTestExpectation(description: "List Buckets")
         
         b2ListBuckets(config: b2Config) { (jsonStr, error) in
-            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
+            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr)")
             
             if error == nil, jsonStr != nil {
                 expect.fulfill()
@@ -94,7 +94,7 @@ class HMDABackblazeB2Tests: XCTestCase {
         b2ListFileNames(config: b2Config,
                         bucketId: bucketID!,
                         startFileName: nil,
-                        maxFileCount: 1000) { (jsonStr, error) in
+                        maxFileCount: nil) { (jsonStr, error) in
                             NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
                             
                             if error == nil, jsonStr != nil {
@@ -119,7 +119,7 @@ class HMDABackblazeB2Tests: XCTestCase {
         let expect = XCTestExpectation(description: "List Files")
         
         b2GetFileInfo(config: b2Config, fileId: fileID!) { (jsonStr, error) in
-            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr!)")
+            NSLog("AUTHORIZATION RESPONSE:\n\n\(jsonStr)")
             
             if error == nil, jsonStr != nil {
                 expect.fulfill()

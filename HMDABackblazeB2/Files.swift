@@ -8,7 +8,9 @@
 
 import Foundation
 
-public func b2ListFileNames(config: B2StorageConfig, bucketId: String, startFileName: String?, maxFileCount: Int, completionHandler: @escaping B2CompletionHandler) {
+let b2MaxFileCount = 10000
+
+public func b2ListFileNames(config: B2StorageConfig, bucketId: String, startFileName: String?, maxFileCount: Int?, completionHandler: @escaping B2CompletionHandler) {
  
     if let url = config.apiUrl {
         var request = URLRequest(url: url.appendingPathComponent("/b2api/v1/b2_list_file_names"))
@@ -22,9 +24,7 @@ public func b2ListFileNames(config: B2StorageConfig, bucketId: String, startFile
             params += ",\"startFileName\":\"\(startFileStr)\""
         }
  
-        if (maxFileCount > -1) {
-            params += ",\"maxFileCount\":" + String(maxFileCount)
-        }
+        params += ",\"maxFileCount\":" + String(maxFileCount ?? b2MaxFileCount)
  
         params += "}"
  
@@ -55,7 +55,7 @@ public func b2GetFileInfo(config: B2StorageConfig, fileId: String, completionHan
 }
 
 
-public func b2ListFileVersions(config: B2StorageConfig, bucketId: String, startFileName: String?, startFileId: String?, maxFileCount: Int, completionHandler: @escaping B2CompletionHandler) {
+public func b2ListFileVersions(config: B2StorageConfig, bucketId: String, startFileName: String?, startFileId: String?, maxFileCount: Int?, completionHandler: @escaping B2CompletionHandler) {
  
     if let url = config.apiUrl {
         var request = URLRequest(url: url.appendingPathComponent("/b2api/v1/b2_list_file_versions"))
@@ -73,9 +73,7 @@ public func b2ListFileVersions(config: B2StorageConfig, bucketId: String, startF
             params += ",\"startFileId\":\"\(startFileIdStr)\""
         }
  
-        if (maxFileCount > -1) {
-            params += ",\"maxFileCount\":" + String(maxFileCount)
-        }
+        params += ",\"maxFileCount\":" + String(maxFileCount ?? b2MaxFileCount)
  
         params += "}"
  
