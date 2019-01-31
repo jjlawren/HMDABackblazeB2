@@ -10,7 +10,7 @@ import Foundation
 
 let b2MaxFileCount = 10000
 
-public func b2ListFileNames(config: B2StorageConfig, bucketId: String, startFileName: String?, maxFileCount: Int?, completionHandler: @escaping B2CompletionHandler) {
+public func b2ListFileNames(config: B2StorageConfig, bucketId: String, prefix: String?, startFileName: String?, maxFileCount: Int?, completionHandler: @escaping B2CompletionHandler) {
  
     if let url = config.apiUrl {
         var request = URLRequest(url: url.appendingPathComponent("/b2api/v1/b2_list_file_names"))
@@ -19,6 +19,10 @@ public func b2ListFileNames(config: B2StorageConfig, bucketId: String, startFile
         request.addValue(config.accountAuthorizationToken!, forHTTPHeaderField: "Authorization")
  
         var params = "{\"bucketId\":\"\(bucketId)\""
+
+        if let prefix = prefix {
+            params += ",\"prefix\":\"\(prefix)\""
+        }
  
         if let startFileStr = startFileName {
             params += ",\"startFileName\":\"\(startFileStr)\""
@@ -55,7 +59,7 @@ public func b2GetFileInfo(config: B2StorageConfig, fileId: String, completionHan
 }
 
 
-public func b2ListFileVersions(config: B2StorageConfig, bucketId: String, startFileName: String?, startFileId: String?, maxFileCount: Int?, completionHandler: @escaping B2CompletionHandler) {
+public func b2ListFileVersions(config: B2StorageConfig, bucketId: String, prefix: String?, startFileName: String?, startFileId: String?, maxFileCount: Int?, completionHandler: @escaping B2CompletionHandler) {
  
     if let url = config.apiUrl {
         var request = URLRequest(url: url.appendingPathComponent("/b2api/v1/b2_list_file_versions"))
@@ -64,6 +68,10 @@ public func b2ListFileVersions(config: B2StorageConfig, bucketId: String, startF
         request.addValue(config.accountAuthorizationToken!, forHTTPHeaderField: "Authorization")
  
         var params = "{\"bucketId\":\"\(bucketId)\""
+
+        if let prefix = prefix {
+            params += ",\"prefix\":\"\(prefix)\""
+        }
  
         if let startFileNameStr = startFileName {
             params += ",\"startFileName\":\"\(startFileNameStr)\""
